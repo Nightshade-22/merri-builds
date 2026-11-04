@@ -1,0 +1,111 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ScreenSwitcher from '../../components/ScreenSwitcher.astro';
+import StatusPill from '../../components/StatusPill.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((p) => ({ params: { slug: p.id }, props: { project: p } }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const d = project.data;
+const base = import.meta.env.BASE_URL;
+---
+<Base title={d.name} description={d.pitch} current="projects">
+  <article>
+    <div class="wrap head">
+      <a class="back" href={`${base}#projects`}>← All projects</a>
+      <div class="title-row">
+        <h1>{d.name}</h1>
+        <StatusPill status={d.status} />
+        {d.version && <span class="version">{d.version}</span>}
+      </div>
+      {d.subtitle && <p class="subtitle">{d.subtitle}</p>}
+      <p class="pitch">{d.pitch}</p>
+      <div class="cta">
+        {d.repo && <a class="btn liquid tint" href={d.repo} target="_blank" rel="noopener">View on GitHub ↗</a>}
+        {d.repo && <a class="btn liquid" href={`${d.repo}/releases/latest`} target="_blank" rel="noopener">Latest release ↗</a>}
+      </div>
+    </div>
+
+    {d.screens.length > 0 && (
+      <div class="wrap block"><ScreenSwitcher name={d.name} screens={d.screens} /></div>
+    )}
+
+    {d.youtube && (
+      <div class="wrap block">
+        <div class="video glass">
+          <iframe src={`https://www.youtube-nocookie.com/embed/${d.youtube}`} title={`${d.name} build video`} loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+    )}
+
+    <div class="wrap block layout">
+      <div class="prose"><Content /></div>
+      {(d.facts.length > 0 || d.tags.length > 0) && (
+        <aside class="facts glass">
+          {d.facts.length > 0 && (
+            <dl>{d.facts.map((f) => (<><dt>{f.label}</dt><dd>{f.value}</dd></>))}</dl>
+          )}
+          {d.tags.length > 0 && <ul class="tags">{d.tags.map((t) => <li>{t}</li>)}</ul>}
+        </aside>
+      )}
+    </div>
+
+    {d.review && (
+      <div class="wrap block">
+        <section class="review glass" aria-labelledby="review-h">
+          <div class="review-head">
+            <h2 id="review-h">Security review</h2>
+            <span class="status" data-status={d.review.status === 'done' ? 'released' : 'queued'}>{d.review.status === 'done' ? 'Done' : 'Pending'}</span>
+            {d.review.summary && <span class="muted">{d.review.summary}</span>}
+          </div>
+          {d.review.fixes.length > 0 && (
+            <ul class="fixes">{d.review.fixes.map((f) => <li><strong>{f.title}</strong>{f.detail}</li>)}</ul>
+          )}
+          {d.review.link && <a href={d.review.link} target="_blank" rel="noopener">{d.review.linkLabel ?? 'Read the write-up'} ↗</a>}
+        </section>
+      </div>
+    )}
+  </article>
+</Base>
+
+<style>
+  .head { padding-block: 28px 8px; display: flex; flex-direction: column; gap: 12px; }
+  .back { color: var(--muted); text-decoration: none; font-size: 14px; }
+  .back:hover { color: var(--fg); }
+  .title-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  h1 { font-size: clamp(36px, 6vw, 56px); font-weight: 700; letter-spacing: -.03em; line-height: 1.05; margin: 0; }
+  .version { font-family: var(--f-code); font-size: 13px; color: var(--muted); }
+  .subtitle { margin: 0; color: var(--muted); font-size: 14px; }
+  .pitch { margin: 0; font-size: 18px; max-width: 58ch; }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+  .block { padding-block: 20px; }
+  .video { border-radius: 16px; padding: 10px; }
+  .video iframe { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 10px; display: block; }
+  .layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: start; }
+  .prose { min-width: 0; max-width: 65ch; }
+  .prose :global(h2) { font-size: 22px; margin: 28px 0 10px; }
+  .prose :global(p), .prose :global(li) { color: var(--fg); }
+  .prose :global(ol), .prose :global(ul) { padding-left: 20px; }
+  .facts { border-radius: 14px; padding: 22px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; font-size: 14px; }
+  dt { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; padding-top: 2px; }
+  dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 0; }
+  .tags li { font-size: 12px; background: var(--chip); border: 1px solid var(--glass-line); border-radius: 6px; padding: 2px 8px; }
+  .review { border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+  .review-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .review h2 { font-size: 20px; }
+  .muted { color: var(--muted); font-size: 14px; }
+  .fixes { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .fixes li { min-width: 0; color: var(--muted); font-size: 14px; }
+  .fixes strong { display: block; color: var(--fg); font-weight: 600; margin-bottom: 2px; }
+  @media (max-width: 820px) {
+    .layout { grid-template-columns: 1fr; }
+    .fixes { grid-template-columns: 1fr; }
+  }
+</style>

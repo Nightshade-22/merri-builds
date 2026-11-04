@@ -1,0 +1,70 @@
+---
+// Shows a project's screenshots in a glass device frame, with Screen and Device toggles.
+interface Screen { label: string; caption: string; tablet?: string; phone?: string }
+interface Props { name: string; screens: Screen[] }
+const { name, screens } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const hasTablet = screens.some((s) => s.tablet);
+const hasPhone = screens.some((s) => s.phone);
+const startDevice = hasTablet ? 'tablet' : 'phone';
+const id = `sw-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+---
+{screens.length > 0 && (
+  <div class="showcase" id={id} data-switcher>
+    <div class="controls">
+      {screens.length > 1 && (
+        <div class="seg liquid" role="group" aria-label="Screen">
+          {screens.map((s, i) => (
+            <button type="button" data-view={i} aria-pressed={i === 0 ? 'true' : 'false'}>{s.label}</button>
+          ))}
+        </div>
+      )}
+      {hasTablet && hasPhone && (
+        <div class="seg liquid" role="group" aria-label="Device">
+          <button type="button" data-device="tablet" aria-pressed="true">Tablet</button>
+          <button type="button" data-device="phone" aria-pressed="false">Phone</button>
+        </div>
+      )}
+    </div>
+    <div class="device glass" data-device={startDevice}>
+      <div class="shot">
+        {screens.flatMap((s, i) =>
+          (['tablet', 'phone'] as const)
+            .filter((d) => s[d])
+            .map((d) => (
+              <img
+                src={`${base}${s[d]}`}
+                data-k={`${d}-${i}`}
+                alt={`${name} ${s.label} screen on a ${d}`}
+                hidden={!(d === startDevice && i === 0)}
+                loading={d === startDevice && i === 0 ? 'eager' : 'lazy'}
+              />
+            ))
+        )}
+      </div>
+    </div>
+    <p class="caption" data-caption>{screens[0].caption}</p>
+    <script type="application/json" data-captions set:html={JSON.stringify(screens.map((s) => s.caption))} />
+  </div>
+)}
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-switcher]').forEach((root) => {
+    const captions: string[] = JSON.parse(root.querySelector('[data-captions]')?.textContent || '[]');
+    const frame = root.querySelector<HTMLElement>('.device')!;
+    const cap = root.querySelector<HTMLElement>('[data-caption]')!;
+    let view = 0;
+    let device = frame.dataset.device || 'tablet';
+    const render = () => {
+      frame.dataset.device = device;
+      root.querySelectorAll<HTMLImageElement>('img[data-k]').forEach((img) => {
+        img.hidden = img.dataset.k !== `${device}-${view}`;
+      });
+      cap.textContent = captions[view] || '';
+      root.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.view) === view)));
+      root.querySelectorAll<HTMLButtonElement>('[data-device]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.device === device)));
+    };
+    root.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((b) => b.addEventListener('click', () => { view = Number(b.dataset.view); render(); }));
+    root.querySelectorAll<HTMLButtonElement>('button[data-device]').forEach((b) => b.addEventListener('click', () => { device = b.dataset.device!; render(); }));
+  });
+</script>

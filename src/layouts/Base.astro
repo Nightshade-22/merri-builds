@@ -1,0 +1,49 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  current?: 'home' | 'projects';
+}
+const { title, description = 'Open-source tools Merri builds with Claude, reviews like an auditor, and releases for anyone to use.', current } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const pageTitle = title ? `${title} · Merri Builds` : 'Merri Builds';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="wrap">
+        <div class="navbar glass">
+          <a class="logo" href={base}>merri<span>.</span>builds</a>
+          <nav aria-label="Sections">
+            <a href={`${base}#projects`} aria-current={current === 'projects' ? 'page' : undefined}>projects</a>
+            <a href={`${base}#process`}>process</a>
+            <a href={`${base}#follow`}>follow</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <div class="wrap">
+        <span>Merri Builds · Chennai</span>
+        <span>Independent project. Not affiliated with Anthropic.</span>
+      </div>
+    </footer>
+  </body>
+</html>

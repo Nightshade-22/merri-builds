@@ -1,0 +1,6 @@
+---
+interface Props { status: 'idea' | 'queued' | 'in-build' | 'released' }
+const labels = { idea: 'Idea', queued: 'Queued', 'in-build': 'In build', released: 'Released' };
+const { status } = Astro.props;
+---
+<span class="status" data-status={status}>{labels[status]}</span>
