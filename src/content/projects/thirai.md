@@ -36,8 +36,8 @@ review:
   controls:
     - title: USB by default
       detail: The PC app listens on 127.0.0.1 only, so nothing else on your network can send it commands. Wi-Fi mode is opt-in.
-    - title: QR pairing
-      detail: The phone scans a code from the PC console to connect, in both USB and Wi-Fi mode.
+    - title: Random pairing key
+      detail: The PC app makes a random 16-character key on first run and shows it as a QR code. Every command from the phone must carry it, or it's refused.
     - title: Checked commands
       detail: The phone can only switch to scenes OBS itself lists, and unknown sound names are ignored.
   link: https://github.com/Nightshade-22/thirai/pull/6
