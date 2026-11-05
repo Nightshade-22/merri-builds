@@ -7,8 +7,9 @@ interface Props {
   status: 'idea' | 'queued' | 'in-build' | 'released';
   tags: string[];
   cover?: string;
+  controls?: string[];
 }
-const { slug, name, pitch, status, tags, cover } = Astro.props;
+const { slug, name, pitch, status, tags, cover, controls = [] } = Astro.props;
 const base = import.meta.env.BASE_URL;
 ---
 <a class="card glass" href={`${base}projects/${slug}/`} data-status={status} data-tags={tags.join('|')}>
@@ -20,6 +21,14 @@ const base = import.meta.env.BASE_URL;
   <div class="body">
     <div class="row"><h3>{name}</h3><StatusPill status={status} /></div>
     <p>{pitch}</p>
+    {controls.length > 0 && (
+      <div class="controls">
+        <span class="ctl-label">Controls in place</span>
+        <ul>{controls.map((c) => (
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>{c}</li>
+        ))}</ul>
+      </div>
+    )}
     {tags.length > 0 && <ul class="tags">{tags.map((t) => <li>{t}</li>)}</ul>}
   </div>
 </a>
@@ -35,6 +44,11 @@ const base = import.meta.env.BASE_URL;
   .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
   h3 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
   p { margin: 0; color: var(--muted); font-size: 15px; }
+  .controls { border-top: 1px solid var(--glass-line); padding-top: 10px; margin-top: 2px; display: flex; flex-direction: column; gap: 6px; }
+  .ctl-label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .controls ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+  .controls li { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+  .controls svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
   .tags { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 4px 0 0; }
   .tags li { font-size: 12px; background: var(--chip); border: 1px solid var(--glass-line); border-radius: 6px; padding: 2px 8px; }
 </style>

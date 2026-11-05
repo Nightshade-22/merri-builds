@@ -62,7 +62,7 @@ const coverOf = (p: (typeof projects)[number]) => p.data.screens[0]?.tablet ?? p
       )}
       <div class="grid">
         {projects.map((p) => (
-          <ProjectCard slug={p.id} name={p.data.name} pitch={p.data.pitch} status={p.data.status} tags={p.data.tags} cover={coverOf(p)} />
+          <ProjectCard slug={p.id} name={p.data.name} pitch={p.data.pitch} status={p.data.status} tags={p.data.tags} cover={coverOf(p)} controls={p.data.review?.controls.map((c) => c.title)} />
         ))}
       </div>
       <p class="empty" hidden>No projects with that status yet.</p>

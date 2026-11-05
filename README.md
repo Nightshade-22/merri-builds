@@ -30,7 +30,7 @@ Each project is one Markdown file in `src/content/projects/`. The home page grid
 | `youtube` | no | YouTube video ID (the part after `v=`), embedded on the project page |
 | `facts` | no | List of `label` / `value` pairs for the side panel |
 | `screens` | no | List of screenshots with `label`, `caption`, and `tablet` and/or `phone` paths under `public/` |
-| `review` | no | Security review: `status` (`pending` or `done`), `summary`, `fixes` (title + detail), `link`, `linkLabel` |
+| `review` | no | Security review: `status` (`pending` or `done`), `summary`, `controls` (the security controls in place, each a `title` + `detail`; titles also show on the home page card), `link`, `linkLabel` |
 
 The schema lives in `src/content.config.ts`. A typo in a field name or status fails the build with a clear message, so broken entries never reach the live site.
 

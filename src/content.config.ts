@@ -27,7 +27,7 @@ const projects = defineCollection({
       .object({
         status: z.enum(['pending', 'done']),
         summary: z.string().optional(),
-        fixes: z.array(z.object({ title: z.string(), detail: z.string() })).default([]),
+        controls: z.array(z.object({ title: z.string(), detail: z.string() })).default([]), // security controls in place
         link: z.string().url().optional(),
         linkLabel: z.string().optional(),
       })

@@ -33,7 +33,7 @@ screens:
 review:
   status: done
   summary: Checked in v0.1.1.
-  fixes:
+  controls:
     - title: USB by default
       detail: The PC app listens on 127.0.0.1 only, so nothing else on your network can send it commands. Wi-Fi mode is opt-in.
     - title: QR pairing
